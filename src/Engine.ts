@@ -12,7 +12,8 @@ import {
   Vector3,
   WebGLRenderer,
 } from 'three';
-import { ResourcePool } from './lib';
+import { EventBus, ResourcePool } from './lib';
+import { Signal } from './lib/Signal';
 import { getRapier } from './physics/rapier';
 
 const cameraOffset = new Vector3();
@@ -24,6 +25,7 @@ export class Engine {
   public readonly renderer: WebGLRenderer;
   public readonly pool = new ResourcePool();
   public readonly viewPosition = new Vector3();
+  public readonly update = new EventBus<[Engine, number]>();
   public viewAngle = 0;
 
   private mount: HTMLElement | undefined;
@@ -32,13 +34,13 @@ export class Engine {
   private sunlight: DirectionalLight;
 
   constructor() {
-    setEngine(this);
+    console.log('constructing engine');
     this.animate = this.animate.bind(this);
     this.camera = new PerspectiveCamera(40, 1, 0.1, 100);
     this.sunlight = this.createSunlight();
     this.renderer = this.createRenderer();
 
-    const geometry = new SphereGeometry(5, 32, 16);
+    const geometry = new SphereGeometry(3, 32, 16);
     const material = new MeshStandardMaterial({ color: 0xffff00 });
     const sphere = new Mesh(geometry, material);
     this.scene.add(sphere);
@@ -47,7 +49,6 @@ export class Engine {
   /** Shut down the renderer and release all resources. */
   public dispose() {
     this.pool.dispose();
-    setEngine(null);
   }
 
   /** Attach the renderer to the DOM. */
@@ -77,7 +78,11 @@ export class Engine {
   }
 
   /** Update the positions of any moving objects. */
-  public updateScene(_deltaTime: number) {
+  public updateScene(deltaTime: number) {
+    // Run callbacks.
+    this.update.publish(this, deltaTime);
+
+    // Update camera position.
     cameraOffset.setFromSphericalCoords(20, MathUtils.degToRad(45), this.viewAngle);
     this.camera.position.copy(this.viewPosition).add(cameraOffset);
     this.camera.lookAt(this.viewPosition);
@@ -154,13 +159,7 @@ export class Engine {
   }
 }
 
-/** Allow global access to engine object. */
-export function useEngine(): Engine {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (globalThis as any).engine;
-}
-
-export function setEngine(engine: Engine | null) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (globalThis as any).engine = engine;
-}
+/** Static instance of the engine object. It's a signal because the engine gets re-created
+    and replaced during a hot reload.
+ */
+export const engineInstance = new Signal(new Engine());
