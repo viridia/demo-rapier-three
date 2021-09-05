@@ -1,6 +1,6 @@
 {
   "name": "demo-rapier-three",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "scripts": {
     "build": "tsc && vite build",
     "start": "vite --port 4000",
@@ -26,5 +26,23 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "typescript": "^4.3.2",
     "vite": "^2.5.2"
-  }
+  },
+  "description": "Demonstration of three.js integrated with rapier3d.js.",
+  "main": "src/main.tsx",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/viridia/demo-rapier-three.git"
+  },
+  "keywords": [
+    "three",
+    "rapier",
+    "demo",
+    "example"
+  ],
+  "author": "Talin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/viridia/demo-rapier-three/issues"
+  },
+  "homepage": "https://github.com/viridia/demo-rapier-three#readme"
 }
