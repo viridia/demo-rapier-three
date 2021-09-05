@@ -17,7 +17,7 @@ export class Signal<T> {
   }
 
   /** Update the value of the signal. */
-  public put(newValue: T): void {
+  public set(newValue: T): void {
     if (this.value !== newValue) {
       this.value = newValue;
       if (this.observers) {
@@ -65,5 +65,5 @@ export function useSignalValue<T>(signal: Signal<T>): T {
 /** Returns both the signal value and a setter; re-renders when signal changes. */
 export function useSignal<T>(signal: Signal<T>): [T, (value: T) => void] {
   const value = useSignalValue(signal);
-  return [value, signal.put.bind(signal)]
+  return [value, signal.set.bind(signal)]
 }

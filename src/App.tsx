@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { engineInstance } from './Engine';
-import { useSignalValue } from './lib/Signal';
 import './App.css';
+import { FPSCounter } from './ui/FPSCounter';
+import { useEngine } from './useEngine';
 
 function App() {
-  const engine = useSignalValue(engineInstance);
+  const engine = useEngine();
   const [renderElt, setRenderElt] = useState<HTMLElement | null>(null);
 
   // Dispose of the engine when this is unmounted, or when engine changes.
@@ -18,15 +18,9 @@ function App() {
     }
   }, [renderElt, engine]);
 
-  return <div className="scene" ref={setRenderElt}></div>;
-}
-
-// Handle hot reloading of the engine
-if (import.meta.hot) {
-  import.meta.hot.accept('./Engine', newEngine => {
-    const { Engine } = newEngine;
-    engineInstance.put(new Engine());
-  });
+  return <div className="scene" ref={setRenderElt}>
+    <FPSCounter />
+  </div>;
 }
 
 export default App;

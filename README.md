@@ -32,6 +32,6 @@ Then navigate your browser to `localhost:4000`.
 # Hot reloading
 
 The sample app demonstrates how to integrate Vite's 'hot reloading' feature with the three.js
-renderer. This means that editing source files will cause the renderer and all resources to be
-disposed and then re-created with the updated code, without needing to reload the browser page
-or restart the entire application.
+renderer. This means that editing source files will cause the renderer to be disposed and then
+re-created with the updated code, without needing to reload the browser page or restart the
+entire application.
