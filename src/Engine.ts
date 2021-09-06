@@ -11,7 +11,7 @@ import {
   SphereGeometry,
   sRGBEncoding,
   Vector3,
-  WebGLRenderer
+  WebGLRenderer,
 } from 'three';
 import { EventBus, ResourcePool, Signal } from './lib';
 import { getRapier } from './physics/rapier';
@@ -41,14 +41,20 @@ export class Engine {
     this.createAmbientLight();
     this.renderer = this.createRenderer();
 
-    const geometry = new SphereGeometry(7, 32, 16);
+    const geometry = new SphereGeometry(1, 32, 16);
     const material = new MeshStandardMaterial({ color: 0xffff00 });
     const sphere = new Mesh(geometry, material);
+    sphere.position.set(0, 2, 0);
     this.scene.add(sphere);
 
-    const terrain = new TerrainShape(new Vector3(0, 0, 0));
-    terrain.addToScene(this.scene);
-    this.pool.add(terrain);
+    // Generate some terrain patches.
+    for (let y = -32; y < 32; y += 16) {
+      for (let x = -32; x < 32; x += 16) {
+        const terrain = new TerrainShape(new Vector3(x, 0, y));
+        terrain.addToScene(this.scene);
+        this.pool.add(terrain);
+      }
+    }
   }
 
   /** Shut down the renderer and release all resources. */
@@ -154,8 +160,8 @@ export class Engine {
 
   public createAmbientLight() {
     const light = new HemisphereLight(
-      new Color(0xb1e1ff).multiplyScalar(.2).convertSRGBToLinear(),
-      new Color(0xb97a20).multiplyScalar(.2).convertSRGBToLinear(),
+      new Color(0xb1e1ff).multiplyScalar(0.2).convertSRGBToLinear(),
+      new Color(0xb97a20).multiplyScalar(0.2).convertSRGBToLinear(),
       0.6
     );
     this.scene.add(light);
