@@ -1,3 +1,4 @@
+import { CoefficientCombineRule, ColliderDesc, RigidBody, RigidBodyDesc, World } from '@dimforge/rapier3d-compat';
 import {
   Clock,
   Color,
@@ -33,6 +34,10 @@ export class Engine {
   private frameId: number | null = null;
   private clock = new Clock();
   private sunlight: DirectionalLight;
+  private terrain: TerrainShape[] = [];
+  private physicsWorld?: World;
+  private sphere: Mesh;
+  private sphereBody?: RigidBody;
 
   constructor() {
     this.animate = this.animate.bind(this);
@@ -43,15 +48,16 @@ export class Engine {
 
     const geometry = new SphereGeometry(1, 32, 16);
     const material = new MeshStandardMaterial({ color: 0xffff00 });
-    const sphere = new Mesh(geometry, material);
-    sphere.position.set(0, 2, 0);
-    this.scene.add(sphere);
+    this.sphere = new Mesh(geometry, material);
+    this.sphere.castShadow = true;
+    this.scene.add(this.sphere);
 
     // Generate some terrain patches.
     for (let y = -32; y < 32; y += 16) {
       for (let x = -32; x < 32; x += 16) {
         const terrain = new TerrainShape(new Vector3(x, 0, y));
         terrain.addToScene(this.scene);
+        this.terrain.push(terrain);
         this.pool.add(terrain);
       }
     }
@@ -70,7 +76,30 @@ export class Engine {
     this.onWindowResize();
 
     // Make sure physics WASM bundle is initialized before starting rendering loop.
+    // Physics objects cannot be created until after physics engine is initialized.
     await getRapier();
+
+    // Create physics for terrain
+    const gravity = new Vector3(0.0, -9.81, 0.0);
+    this.physicsWorld = new World(gravity);
+    this.terrain.forEach(terr => terr.addPhysics(this.physicsWorld!));
+
+    // Create rigid body for the sphere.
+    const rbDesc = RigidBodyDesc.newDynamic()
+      .setTranslation(6, 4, 0)
+      .setLinearDamping(0.1)
+      // .restrictRotations(false, true, false) // Y-axis only
+      .setCcdEnabled(true);
+    this.sphereBody = this.physicsWorld.createRigidBody(rbDesc);
+
+    const clDesc = ColliderDesc.ball(1)
+      .setFriction(0.1)
+      .setFrictionCombineRule(CoefficientCombineRule.Max)
+      // .setTranslation(0, 0, 0)
+      .setRestitution(0.6)
+      .setRestitutionCombineRule(CoefficientCombineRule.Max);
+      // .setCollisionGroups(CollisionMask.ActorMask | CollisionMask.TouchActor);
+    this.physicsWorld.createCollider(clDesc, this.sphereBody.handle);
 
     if (!this.frameId) {
       this.clock.start();
@@ -92,6 +121,11 @@ export class Engine {
   public updateScene(deltaTime: number) {
     // Run callbacks.
     this.update.publish(this, deltaTime);
+
+    // Run physics
+    this.physicsWorld?.step();
+    const t = this.sphereBody!.translation();
+    this.sphere.position.set(t.x, t.y, t.z);
 
     // Update camera position.
     cameraOffset.setFromSphericalCoords(20, MathUtils.degToRad(75), this.viewAngle);

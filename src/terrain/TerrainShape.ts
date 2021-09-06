@@ -1,3 +1,4 @@
+import { ColliderDesc, RigidBodyDesc, World } from '@dimforge/rapier3d-compat';
 import {
   BufferGeometry,
   Color,
@@ -23,6 +24,7 @@ export class TerrainShape {
     this.mesh.position.copy(origin);
     this.mesh.matrixAutoUpdate = false;
     this.mesh.updateMatrix();
+    this.mesh.receiveShadow = true;
 
     for (let y = 0; y < TERRAIN_STRIDE; y++) {
       for (let x = 0; x < TERRAIN_STRIDE; x++) {
@@ -95,6 +97,22 @@ export class TerrainShape {
     this.geometry.setIndex(indices);
     this.geometry.computeVertexNormals();
   }
+
+  public addPhysics(world: World) {
+    const rbDesc = RigidBodyDesc.newStatic().setTranslation(
+      this.origin.x + TERRAIN_SIZE * 0.5,
+      this.origin.y,
+      this.origin.z + TERRAIN_SIZE * 0.5
+    );
+    const terrainBody = world.createRigidBody(rbDesc);
+    const clDesc = ColliderDesc.heightfield(
+      TERRAIN_SIZE,
+      TERRAIN_SIZE,
+      this.heightMap,
+      new Vector3(TERRAIN_SIZE, 1, TERRAIN_SIZE)
+    );
+    world.createCollider(clDesc, terrainBody.handle);
+  }
 }
 
-const hmIndex = (x: number, y: number) => y * TERRAIN_STRIDE + x;
+const hmIndex = (x: number, y: number) => x * TERRAIN_STRIDE + y;
