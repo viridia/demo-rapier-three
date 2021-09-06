@@ -1,5 +1,5 @@
 import { engineInstance } from './Engine';
-import { useSignalValue } from './lib/Signal';
+import { useSignalValue } from './lib';
 
 export const useEngine = () => useSignalValue(engineInstance);
 
@@ -9,6 +9,7 @@ export const useEngine = () => useSignalValue(engineInstance);
 if (import.meta.hot) {
   import.meta.hot.accept('./Engine', newEngine => {
     const { Engine } = newEngine;
+    engineInstance.get()?.dispose();
     engineInstance.set(new Engine());
   });
 }

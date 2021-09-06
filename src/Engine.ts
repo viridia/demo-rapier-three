@@ -2,6 +2,7 @@ import {
   Clock,
   Color,
   DirectionalLight,
+  HemisphereLight,
   MathUtils,
   Mesh,
   MeshStandardMaterial,
@@ -10,11 +11,11 @@ import {
   SphereGeometry,
   sRGBEncoding,
   Vector3,
-  WebGLRenderer,
+  WebGLRenderer
 } from 'three';
-import { EventBus, ResourcePool } from './lib';
-import { Signal } from './lib/Signal';
+import { EventBus, ResourcePool, Signal } from './lib';
 import { getRapier } from './physics/rapier';
+import { TerrainShape } from './terrain/TerrainShape';
 
 const cameraOffset = new Vector3();
 
@@ -25,8 +26,8 @@ export class Engine {
   public readonly renderer: WebGLRenderer;
   public readonly pool = new ResourcePool();
   public readonly viewPosition = new Vector3();
-  public readonly update = new EventBus<[Engine, number]>();
   public viewAngle = 0;
+  public readonly update = new EventBus<[Engine, number]>();
 
   private mount: HTMLElement | undefined;
   private frameId: number | null = null;
@@ -34,16 +35,20 @@ export class Engine {
   private sunlight: DirectionalLight;
 
   constructor() {
-    console.log('constructing engine');
     this.animate = this.animate.bind(this);
     this.camera = new PerspectiveCamera(40, 1, 0.1, 100);
     this.sunlight = this.createSunlight();
+    this.createAmbientLight();
     this.renderer = this.createRenderer();
 
-    const geometry = new SphereGeometry(3, 32, 16);
+    const geometry = new SphereGeometry(7, 32, 16);
     const material = new MeshStandardMaterial({ color: 0xffff00 });
     const sphere = new Mesh(geometry, material);
     this.scene.add(sphere);
+
+    const terrain = new TerrainShape(new Vector3(0, 0, 0));
+    terrain.addToScene(this.scene);
+    this.pool.add(terrain);
   }
 
   /** Shut down the renderer and release all resources. */
@@ -83,7 +88,7 @@ export class Engine {
     this.update.publish(this, deltaTime);
 
     // Update camera position.
-    cameraOffset.setFromSphericalCoords(20, MathUtils.degToRad(45), this.viewAngle);
+    cameraOffset.setFromSphericalCoords(20, MathUtils.degToRad(75), this.viewAngle);
     this.camera.position.copy(this.viewPosition).add(cameraOffset);
     this.camera.lookAt(this.viewPosition);
     this.camera.updateMatrixWorld();
@@ -145,6 +150,16 @@ export class Engine {
     this.scene.add(sunlight);
     this.scene.add(sunlight.target);
     return sunlight;
+  }
+
+  public createAmbientLight() {
+    const light = new HemisphereLight(
+      new Color(0xb1e1ff).multiplyScalar(.2).convertSRGBToLinear(),
+      new Color(0xb97a20).multiplyScalar(.2).convertSRGBToLinear(),
+      0.6
+    );
+    this.scene.add(light);
+    return light;
   }
 
   private adjustLightPosition() {

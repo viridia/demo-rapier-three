@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 
 type Observer<T> = (data: T) => void;
 
-/** Implementation of classic observer pattern. Contains a datum which will signal
-    observers whenever the value changes. Note that it uses a shallow comparison to determine
+/** Implementation of classic observer pattern. Maintains a list of observers which will be
+    notified whenever the signal value changes. It uses a shallow comparison to determine
     if a change has occurred.
  */
 export class Signal<T> {
