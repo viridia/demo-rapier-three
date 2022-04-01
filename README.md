@@ -3,9 +3,7 @@
 This repo provides a working example of rendering using [three.js](https://threejs.org/) and
 physics simulation using [rapier3d](https://rapier.rs/).
 
-![Screenshot](./images/screen.png)
-
-![Movie](./images/sample.mov)
+https://user-images.githubusercontent.com/1166135/161326540-5bfbfc97-ad7f-4b9b-a35b-7e2967a91f50.mov
 
 This package also demonstrates how to organize a non-trivial three.js project with a bundler.
 Many three.js examples consists of a single HTML file with script tags, which is not a great
