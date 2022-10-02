@@ -1,14 +1,21 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
-import { KeyStateProvider } from './ui/KeyState';
+import { createApp } from './createApp';
+import type { Engine } from './Engine';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <KeyStateProvider>
-      <App />
-    </KeyStateProvider>
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+let engine: Engine | null = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+  engine = createApp();
+});
+
+// Handle hot reloading of the engine.
+if (import.meta.hot) {
+  import.meta.hot.accept('./createApp', ({ createApp }) => {
+    console.log('hot');
+    if (engine) {
+      engine.detach();
+      engine.dispose();
+    }
+    engine = createApp();
+  });
+}

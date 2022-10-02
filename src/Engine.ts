@@ -1,4 +1,10 @@
-import { CoefficientCombineRule, ColliderDesc, RigidBody, RigidBodyDesc, World } from '@dimforge/rapier3d-compat';
+import {
+  CoefficientCombineRule,
+  ColliderDesc,
+  RigidBody,
+  RigidBodyDesc,
+  World,
+} from '@dimforge/rapier3d-compat';
 import {
   Clock,
   Color,
@@ -14,7 +20,7 @@ import {
   Vector3,
   WebGLRenderer,
 } from 'three';
-import { EventBus, ResourcePool, Signal } from './lib';
+import { EventBus, ResourcePool } from './lib';
 import { getRapier } from './physics/rapier';
 import { TerrainShape } from './terrain/TerrainShape';
 
@@ -40,6 +46,7 @@ export class Engine {
   private sphereBody?: RigidBody;
 
   constructor() {
+    console.log('construct');
     this.animate = this.animate.bind(this);
     this.camera = new PerspectiveCamera(40, 1, 0.1, 100);
     this.sunlight = this.createSunlight();
@@ -61,10 +68,16 @@ export class Engine {
         this.pool.add(terrain);
       }
     }
+
+    cameraOffset.setFromSphericalCoords(20, MathUtils.degToRad(75), this.viewAngle);
+    this.camera.position.copy(this.viewPosition).add(cameraOffset);
+    this.camera.lookAt(this.viewPosition);
+    this.camera.updateMatrixWorld();
   }
 
   /** Shut down the renderer and release all resources. */
   public dispose() {
+    console.log('dispose');
     this.pool.dispose();
   }
 
@@ -98,7 +111,7 @@ export class Engine {
       // .setTranslation(0, 0, 0)
       .setRestitution(0.6)
       .setRestitutionCombineRule(CoefficientCombineRule.Max);
-      // .setCollisionGroups(CollisionMask.ActorMask | CollisionMask.TouchActor);
+    // .setCollisionGroups(CollisionMask.ActorMask | CollisionMask.TouchActor);
     this.physicsWorld.createCollider(clDesc, this.sphereBody.handle);
 
     if (!this.frameId) {
@@ -126,12 +139,6 @@ export class Engine {
     this.physicsWorld?.step();
     const t = this.sphereBody!.translation();
     this.sphere.position.set(t.x, t.y, t.z);
-
-    // Update camera position.
-    cameraOffset.setFromSphericalCoords(20, MathUtils.degToRad(75), this.viewAngle);
-    this.camera.position.copy(this.viewPosition).add(cameraOffset);
-    this.camera.lookAt(this.viewPosition);
-    this.camera.updateMatrixWorld();
   }
 
   /** Return the elapsed running time. */
@@ -213,8 +220,3 @@ export class Engine {
     this.sunlight.position.set(lightPos.x + 6, lightPos.y + 8, lightPos.z + 4);
   }
 }
-
-/** Static instance of the engine object. It's a signal because the engine gets re-created
-    and replaced during a hot reload.
- */
-export const engineInstance = new Signal(new Engine());

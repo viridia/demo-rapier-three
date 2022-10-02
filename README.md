@@ -15,7 +15,6 @@ demonstrates how to integrate with several popular JavaScript tools and librarie
 * [Vite](https://vitejs.dev/)
 * [ESLint](https://eslint.org/)
 * [Prettier](https://prettier.io/)
-* [React](https://reactjs.org/)
 
 In general, the code strives to conform to industry standard practices for commercial JavaScript
 application development.

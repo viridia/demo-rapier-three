@@ -4,12 +4,10 @@ module.exports = {
     'eslint:recommended',
     'plugin:import/recommended',
     'plugin:import/typescript',
-    'plugin:react/recommended',
-    'plugin:react-hooks/recommended',
     'plugin:@typescript-eslint/recommended',
   ],
   parser: '@typescript-eslint/parser',
-  plugins: ['import', 'react', 'react-hooks', '@typescript-eslint'],
+  plugins: ['import', '@typescript-eslint'],
 
   env: {
     browser: true,
@@ -22,12 +20,6 @@ module.exports = {
     sourceType: 'module',
     ecmaFeatures: {
       jsx: true,
-    },
-  },
-
-  settings: {
-    react: {
-      version: 'detect',
     },
   },
 
