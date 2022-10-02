@@ -10,12 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Handle hot reloading of the engine.
 if (import.meta.hot) {
-  import.meta.hot.accept('./createApp', ({ createApp }) => {
-    console.log('hot');
+  import.meta.hot.accept('./createApp', module => {
     if (engine) {
       engine.detach();
       engine.dispose();
     }
-    engine = createApp();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    engine = (module as any).createApp();
   });
 }

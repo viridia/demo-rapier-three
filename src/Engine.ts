@@ -20,7 +20,7 @@ import {
   Vector3,
   WebGLRenderer,
 } from 'three';
-import { EventBus, ResourcePool } from './lib';
+import { EventSource, ResourcePool } from './lib';
 import { getRapier } from './physics/rapier';
 import { TerrainShape } from './terrain/TerrainShape';
 
@@ -34,7 +34,7 @@ export class Engine {
   public readonly pool = new ResourcePool();
   public readonly viewPosition = new Vector3();
   public viewAngle = 0;
-  public readonly update = new EventBus<[Engine, number]>();
+  public readonly update = new EventSource<{ update: number }>();
 
   private mount: HTMLElement | undefined;
   private frameId: number | null = null;
@@ -46,7 +46,6 @@ export class Engine {
   private sphereBody?: RigidBody;
 
   constructor() {
-    console.log('construct');
     this.animate = this.animate.bind(this);
     this.camera = new PerspectiveCamera(40, 1, 0.1, 100);
     this.sunlight = this.createSunlight();
@@ -77,7 +76,6 @@ export class Engine {
 
   /** Shut down the renderer and release all resources. */
   public dispose() {
-    console.log('dispose');
     this.pool.dispose();
   }
 
@@ -133,7 +131,7 @@ export class Engine {
   /** Update the positions of any moving objects. */
   public updateScene(deltaTime: number) {
     // Run callbacks.
-    this.update.publish(this, deltaTime);
+    this.update.emit('update', deltaTime);
 
     // Run physics
     this.physicsWorld?.step();

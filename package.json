@@ -6,7 +6,10 @@
     "start": "vite --port 4000",
     "lint": "eslint -c .eslintrc.js src --ext ts --ext tsx",
     "serve": "vite preview",
-    "test": "npm run build"
+    "test": "npm run test:compile && npm run test:unit",
+    "test:compile": "tsc --noEmit",
+    "test:unit": "vitest run --coverage",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "^0.7.3",
@@ -16,10 +19,12 @@
     "@types/three": "^0.131.0",
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.30.0",
+    "@vitest/coverage-c8": "^0.23.4",
     "eslint": "^7.32.0",
     "eslint-plugin-import": "^2.24.2",
     "typescript": "^4.3.2",
-    "vite": "^2.5.2"
+    "vite": "^3.1.4",
+    "vitest": "^0.23.4"
   },
   "description": "Demonstration of three.js integrated with rapier3d.js.",
   "main": "src/main.tsx",

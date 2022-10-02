@@ -19,7 +19,7 @@ export function createApp() {
   orbitControls.maxPolarAngle = Math.PI / 2;
 
   orbitControls.update();
-  engine.update.subscribe(() => {
+  engine.update.subscribe('update', () => {
     orbitControls.update();
   });
 
