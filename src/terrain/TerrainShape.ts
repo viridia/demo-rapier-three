@@ -111,7 +111,7 @@ export class TerrainShape {
       this.heightMap,
       new Vector3(TERRAIN_SIZE, 1, TERRAIN_SIZE)
     );
-    world.createCollider(clDesc, terrainBody.handle);
+    world.createCollider(clDesc, terrainBody);
   }
 }
 

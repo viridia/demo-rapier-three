@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1664751952296" clover="3.2.0">
-  <project timestamp="1664751952296" name="All files">
+<coverage generated="1664752253325" clover="3.2.0">
+  <project timestamp="1664752253325" name="All files">
     <metrics statements="66" coveredstatements="62" conditionals="9" coveredconditionals="8" methods="6" coveredmethods="5" elements="81" coveredelements="75" complexity="0" loc="66" ncloc="66" packages="1" files="1" classes="1"/>
     <file name="EventSource.ts" path="/Users/talin/Projects/games/demo-rapier-three/src/lib/EventSource.ts">
       <metrics statements="66" coveredstatements="62" conditionals="9" coveredconditionals="8" methods="6" coveredmethods="5"/>

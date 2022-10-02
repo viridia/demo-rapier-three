@@ -110,7 +110,7 @@ export class Engine {
       .setRestitution(0.6)
       .setRestitutionCombineRule(CoefficientCombineRule.Max);
     // .setCollisionGroups(CollisionMask.ActorMask | CollisionMask.TouchActor);
-    this.physicsWorld.createCollider(clDesc, this.sphereBody.handle);
+    this.physicsWorld.createCollider(clDesc, this.sphereBody);
 
     if (!this.frameId) {
       this.clock.start();
