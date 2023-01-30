@@ -18,7 +18,7 @@
   "devDependencies": {
     "@types/three": "^0.131.0",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
-    "@typescript-eslint/parser": "^4.30.0",
+    "@typescript-eslint/parser": "^4.33.0",
     "@vitest/coverage-c8": "^0.28.3",
     "eslint": "^7.32.0",
     "eslint-plugin-import": "^2.26.0",
