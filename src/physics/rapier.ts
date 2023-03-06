@@ -1,7 +1,6 @@
-import RAPIER from '@dimforge/rapier3d-compat';
-export type Rapier = typeof RAPIER;
+export type Rapier = typeof import('@dimforge/rapier3d');
 
 export function getRapier() {
   // eslint-disable-next-line import/no-named-as-default-member
-  return RAPIER.init().then(() => RAPIER);
+  return import('@dimforge/rapier3d');
 }

@@ -1,10 +1,4 @@
-import {
-  CoefficientCombineRule,
-  ColliderDesc,
-  RigidBody,
-  RigidBodyDesc,
-  World,
-} from '@dimforge/rapier3d-compat';
+import type { RigidBody, World } from '@dimforge/rapier3d';
 import {
   Clock,
   Color,
@@ -21,7 +15,7 @@ import {
   WebGLRenderer,
 } from 'three';
 import { EventSource, ResourcePool } from './lib';
-import { getRapier } from './physics/rapier';
+import { getRapier, Rapier } from './physics/rapier';
 import { TerrainShape } from './terrain/TerrainShape';
 
 const cameraOffset = new Vector3();
@@ -35,6 +29,7 @@ export class Engine {
   public readonly viewPosition = new Vector3();
   public viewAngle = 0;
   public readonly update = new EventSource<{ update: number }>();
+  public rapier!: Rapier;
 
   private mount: HTMLElement | undefined;
   private frameId: number | null = null;
@@ -88,27 +83,27 @@ export class Engine {
 
     // Make sure physics WASM bundle is initialized before starting rendering loop.
     // Physics objects cannot be created until after physics engine is initialized.
-    await getRapier();
+    const r = (this.rapier = await getRapier());
 
     // Create physics for terrain
     const gravity = new Vector3(0.0, -9.81, 0.0);
-    this.physicsWorld = new World(gravity);
-    this.terrain.forEach(terr => terr.addPhysics(this.physicsWorld!));
+    this.physicsWorld = new r.World(gravity);
+    this.terrain.forEach(terr => terr.addPhysics(this.physicsWorld!, r));
 
     // Create rigid body for the sphere.
-    const rbDesc = RigidBodyDesc.newDynamic()
+    const rbDesc = r.RigidBodyDesc.dynamic()
       .setTranslation(6, 4, 0)
       .setLinearDamping(0.1)
       // .restrictRotations(false, true, false) // Y-axis only
       .setCcdEnabled(true);
     this.sphereBody = this.physicsWorld.createRigidBody(rbDesc);
 
-    const clDesc = ColliderDesc.ball(1)
+    const clDesc = this.rapier.ColliderDesc.ball(1)
       .setFriction(0.1)
-      .setFrictionCombineRule(CoefficientCombineRule.Max)
+      .setFrictionCombineRule(r.CoefficientCombineRule.Max)
       // .setTranslation(0, 0, 0)
       .setRestitution(0.6)
-      .setRestitutionCombineRule(CoefficientCombineRule.Max);
+      .setRestitutionCombineRule(r.CoefficientCombineRule.Max);
     // .setCollisionGroups(CollisionMask.ActorMask | CollisionMask.TouchActor);
     this.physicsWorld.createCollider(clDesc, this.sphereBody);
 
@@ -176,7 +171,6 @@ export class Engine {
     renderer.autoClearColor = true;
     renderer.autoClearDepth = true;
     renderer.autoClearStencil = false;
-    renderer.gammaFactor = 2.2;
     renderer.outputEncoding = sRGBEncoding;
     return renderer;
   }

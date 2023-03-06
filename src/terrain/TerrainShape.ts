@@ -1,4 +1,4 @@
-import { ColliderDesc, RigidBodyDesc, World } from '@dimforge/rapier3d-compat';
+import type { World } from '@dimforge/rapier3d';
 import {
   BufferGeometry,
   Color,
@@ -9,6 +9,7 @@ import {
   Vector3,
 } from 'three';
 import { noise3 } from '../lib';
+import { Rapier } from '../physics/rapier';
 
 const TERRAIN_SIZE = 16;
 const TERRAIN_STRIDE = TERRAIN_SIZE + 1;
@@ -98,14 +99,14 @@ export class TerrainShape {
     this.geometry.computeVertexNormals();
   }
 
-  public addPhysics(world: World) {
-    const rbDesc = RigidBodyDesc.newStatic().setTranslation(
+  public addPhysics(world: World, rapier: Rapier) {
+    const rbDesc = rapier.RigidBodyDesc.fixed().setTranslation(
       this.origin.x + TERRAIN_SIZE * 0.5,
       this.origin.y,
       this.origin.z + TERRAIN_SIZE * 0.5
     );
     const terrainBody = world.createRigidBody(rbDesc);
-    const clDesc = ColliderDesc.heightfield(
+    const clDesc = rapier.ColliderDesc.heightfield(
       TERRAIN_SIZE,
       TERRAIN_SIZE,
       this.heightMap,
